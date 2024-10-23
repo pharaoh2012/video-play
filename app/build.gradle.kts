@@ -8,6 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.pharaoh.videoplay"
+        applicationIdSuffix = ".v001"
         minSdk = 16
         targetSdk = 33
         versionCode = 2

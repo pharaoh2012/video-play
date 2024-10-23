@@ -48,8 +48,8 @@ jobs:
 
     - name: Replace applicationId
       run: |
-        APP_ID=com.pharaoh.videoplay.v${{ github.run_number }}
-        sed -i "s/com.pharaoh.videoplay/$APP_ID/g" app/build.gradle.kts
+        APP_ID=${{ github.run_number }}
+        sed -i "s/001/$APP_ID/g" app/build.gradle.kts
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
