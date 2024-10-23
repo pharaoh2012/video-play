@@ -11,8 +11,8 @@ on:
         required: true
         default: '保健操'
       iconUrl:
-        description: 'Icon URL'
-        required: true
+        description: 'Icon URL (Optional)'
+        required: false
       mp4Url:
         description: 'MP4 URL'
         required: true
@@ -37,7 +37,8 @@ jobs:
         APP_NAME=${{ github.event.inputs.appName }}
         sed -i "s/<string name=\"app_name\">.*<\/string>/<string name=\"app_name\">$APP_NAME<\/string>/g" app/src/main/res/values/strings.xml
 
-    - name: Download and replace icon
+    - name: Download and replace icon (if provided)
+      if: ${{ !isnull(github.event.inputs.iconUrl) }}
       run: |
         ICON_URL=${{ github.event.inputs.iconUrl }}
         curl -L $ICON_URL -o app/src/main/res/drawable/icon.png
