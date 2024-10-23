@@ -1,0 +1,79 @@
+name: Build Android App
+
+on:
+  push:
+    branches:
+      - master # 或者你的默认分支名称
+  workflow_dispatch:
+    inputs:
+      appName:
+        description: 'App Name'
+        required: true
+        default: '保健操'
+      iconUrl:
+        description: 'Icon URL'
+        required: true
+      mp4Url:
+        description: 'MP4 URL'
+        required: true
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: 'gradle'
+
+    - name: Replace app name
+      run: |
+        APP_NAME=${{ github.event.inputs.appName }}
+        sed -i "s/<string name=\"app_name\">.*<\/string>/<string name=\"app_name\">$APP_NAME<\/string>/g" app/src/main/res/values/strings.xml
+
+    - name: Download and replace icon
+      run: |
+        ICON_URL=${{ github.event.inputs.iconUrl }}
+        curl -L $ICON_URL -o app/src/main/res/drawable/icon.png
+
+    - name: Download and replace video
+      run: |
+        MP4_URL=${{ github.event.inputs.mp4Url }}
+        curl -L $MP4_URL -o app/src/main/res/raw/a.mp4
+
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
+
+    - name: Upload Debug APK as Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: debug-apk
+        path: app/build/outputs/apk/debug/*.apk
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: app/build/outputs/apk/debug/*.apk
+        asset_name: app-debug.apk
+        asset_content_type: application/vnd.android.package-archive
