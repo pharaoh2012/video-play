@@ -46,6 +46,11 @@ jobs:
         MP4_URL=${{ github.event.inputs.mp4Url }}
         curl -L $MP4_URL -o app/src/main/res/raw/a.mp4
 
+    - name: Replace applicationId
+      run: |
+        APP_ID=com.pharaoh.videoplay.v${{ github.run_number }}
+        sed -i "s/com.pharaoh.videoplay/$APP_ID/g" app/build.gradle.kts
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
