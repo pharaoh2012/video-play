@@ -8,5 +8,4 @@
 .externalNativeBuild
 .cxx
 local.properties
-/app/src/main/res/raw/*.mp4
 /app/release
