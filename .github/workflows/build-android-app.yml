@@ -5,14 +5,13 @@ on:
     inputs:
       appName:
         description: 'App Name'
-        required: true
-        default: '保健操'
+        required: false
       iconUrl:
         description: 'Icon URL (Optional)'
         required: false
       mp4Url:
         description: 'MP4 URL'
-        required: true
+        required: false
 
 jobs:
   build-apk:
@@ -30,6 +29,7 @@ jobs:
         cache: 'gradle'
 
     - name: Replace app name
+      if: ${{ github.event.inputs.appName != '' }}
       run: |
         APP_NAME=${{ github.event.inputs.appName }}
         sed -i "s/<string name=\"app_name\">.*<\/string>/<string name=\"app_name\">$APP_NAME<\/string>/g" app/src/main/res/values/strings.xml
@@ -41,6 +41,7 @@ jobs:
         curl -L $ICON_URL -o app/src/main/res/drawable/icon.png
 
     - name: Download and replace video
+      if: ${{ github.event.inputs.mp4Url != '' }}
       run: |
         MP4_URL=${{ github.event.inputs.mp4Url }}
         curl -L $MP4_URL -o app/src/main/res/raw/a.mp4
@@ -62,7 +63,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: app/build/outputs/apk/debug/*.apk
-        name: Release v${{ github.run_number }}
+        name: Release v${{ github.run_number }} ${{ github.event.inputs.appName }}
         tag_name: v${{ github.run_number }}
         draft: false
         prerelease: false
