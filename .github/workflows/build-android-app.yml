@@ -1,9 +1,6 @@
 name: Build Android App
 
 on:
-  push:
-    branches:
-      - none # 或者你的默认分支名称
   workflow_dispatch:
     inputs:
       appName:
@@ -38,7 +35,7 @@ jobs:
         sed -i "s/<string name=\"app_name\">.*<\/string>/<string name=\"app_name\">$APP_NAME<\/string>/g" app/src/main/res/values/strings.xml
 
     - name: Download and replace icon (if provided)
-      if: ${{ !isnull(github.event.inputs.iconUrl) }}
+      if: ${{ github.event.inputs.iconUrl != '' }}
       run: |
         ICON_URL=${{ github.event.inputs.iconUrl }}
         curl -L $ICON_URL -o app/src/main/res/drawable/icon.png
