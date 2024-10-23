@@ -3,7 +3,7 @@ name: Build Android App
 on:
   push:
     branches:
-      - master # 或者你的默认分支名称
+      - none # 或者你的默认分支名称
   workflow_dispatch:
     inputs:
       appName:
